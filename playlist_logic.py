@@ -57,36 +57,40 @@ def normalize_song(raw: Song) -> Song:
     }
 
 
+def matches_any(text: str, keywords: List[str]) -> bool:
+    """Return True if any keyword is found in the text."""
+    return any(k in text for k in keywords)
+
+
 def classify_song(song: Song, profile: Dict[str, object]) -> str:
     """Return a mood label given a song and user profile."""
     energy = song.get("energy", 0)
     genre = str(song.get("genre", "")).lower()
     title = str(song.get("title", "")).lower()
 
-    hype_min_energy = profile.get("hype_min_energy", 7)
-    chill_max_energy = profile.get("chill_max_energy", 3)
-    favorite_genre = str(profile.get("favorite_genre", "")).lower()
+    hype_min = profile.get("hype_min_energy", 7)
+    chill_max = profile.get("chill_max_energy", 3)
+    fav_genre = str(profile.get("favorite_genre", "")).lower()
 
     hype_keywords = ["rock", "punk", "party"]
     chill_keywords = ["lofi", "ambient", "sleep"]
 
     is_hype = (
-        energy >= hype_min_energy
-        or genre == favorite_genre
-        or any(k in genre for k in hype_keywords)
+        energy >= hype_min
+        or genre == fav_genre
+        or matches_any(genre, hype_keywords)
     )
 
     is_chill = (
-        energy <= chill_max_energy
-        or any(k in title for k in chill_keywords)
+        energy <= chill_max
+        or matches_any(title, chill_keywords)
     )
 
     if is_hype:
         return "Hype"
-    elif is_chill:
+    if is_chill:
         return "Chill"
-    else:
-        return "Mixed"
+    return "Mixed"
 
 
 def build_playlists(songs: List[Song], profile: Dict[str, object]) -> PlaylistMap:
