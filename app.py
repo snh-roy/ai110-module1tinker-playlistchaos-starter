@@ -244,13 +244,13 @@ def add_song_sidebar():
         tags = [t for t in raw_tags if t]
 
         song: Song = {
-            "title": title,
-            "artist": artist,
-            "genre": genre,
+            "title": title.strip(),
+            "artist": artist.strip(),
+            "genre": genre.strip().lower(),
             "energy": energy,
             "tags": tags,
         }
-        if title and artist:
+        if song["title"] and song["artist"]:
             normalized = normalize_song(song)
             all_songs = st.session_state.songs[:]
             all_songs.append(normalized)
@@ -334,8 +334,8 @@ def stats_section(playlists):
 
     col4, col5, col6 = st.columns(3)
     col4.metric("Mixed songs", stats["mixed_count"])
-    col5.metric("Hype ratio", f"{stats['hype_ratio']:.2f}")
-    col6.metric("Average energy", f"{stats['avg_energy']:.2f}")
+    col5.metric("Hype ratio", f"{stats['hype_ratio']:.1f}%")
+    col6.metric("Average energy", f"{stats['avg_energy']:.1f}")
 
     top_artist = stats["top_artist"]
     if top_artist:
